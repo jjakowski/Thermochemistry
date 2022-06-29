@@ -1,6 +1,6 @@
 # Thermochemistry
 
-Simple code to reproduce  Gaussian 09 results for CO2 with B3LYP/6-31G(d).
+Simple code to reproduce thermochemistry results from Gaussian 09 for CO2 with B3LYP/6-31G(d).
 Gaussian does not print hessian matrix in output, but it can be extracted from formatted checkpoint  ("Cartesian Force Constants").
 The thermochemistry implementation is based on the equations from "G98thermo.pdf"  document.
 
