@@ -1,0 +1,287 @@
+
+
+#
+#  Hessian for fchk file
+#
+V= [
+  1.35299071E-01  3.35196214E-12  1.35299071E-01 -1.53086309E-12  6.25564331E-12
+  1.96023477E+00 -6.76495354E-02 -8.07653704E-13 -1.11562014E-14  3.38365432E-02
+ -1.30814768E-12 -6.76495354E-02 -7.09135870E-12  7.51697058E-13  3.38365432E-02
+  1.14389879E-11 -6.98951801E-12 -9.80117386E-01  8.78803605E-13  5.97850335E-12
+  1.05980615E+00 -6.76495354E-02 -9.49382133E-13  8.60956235E-12  3.38129922E-02
+  7.81577939E-14 -1.71241869E-11  3.38365432E-02 -2.86778620E-13 -6.76495354E-02
+  4.11339591E-12 -7.81577939E-14  3.38129922E-02 -2.97501870E-12 -7.51697058E-13
+  3.38365432E-02  1.39829384E-11  3.71081455E-12 -9.80117386E-01 -1.71238772E-11
+  2.97496287E-12 -7.96887649E-02  8.79791144E-13 -5.97742459E-12  1.05980615E+00
+];
+
+
+[Nx,Ny] = size(V) ;
+
+
+Nxyz =9; 
+VV =  reshape(V',1,Nx*Ny) ;
+
+
+icount =1; 
+for i=1:Nxyz 
+   for j=1:i
+      Hess(i,j) = VV(icount++); 
+      Hess(j,i) = Hess(i,j) ;
+   endfor
+endfor
+ 
+
+Natoms =3 ;
+
+#-----------------
+mH= 1.00794 ;  mD =2.014 ;   mO = 15.9994   ; mC =12 ; mN =  14.0067
+mO = 15.99491   # Gaussian:
+mass_benzene = [ mC; mC; mC;
+         mH; mH; mH;
+         mC; mC; mC;
+         mH; mH; mH;
+         mC; mC; mC;
+         mH; mH; mH;
+         mC; mC; mC;
+         mH; mH; mH;
+         mC; mC; mC;
+         mH; mH; mH;
+         mC; mC; mC;
+         mH; mH; mH ];
+
+mass_co2 = [mC; mC; mC; 
+            mO; mO; mO; 
+            mO; mO; mO];
+
+mass_ooc = [mO; mO; mO; 
+            mC; mC; mC; 
+            mO; mO; mO];
+
+mass =mass_co2 ;
+#mass =mass_ooc ;
+
+
+
+mass_sq = mass *mass'  ;   
+mass_sq_size = size(mass_sq)    ;
+mwHess = Hess ./sqrt(mass_sq) /amu ;  
+
+[cc,ee ] = eig(mwHess) ;
+ ee=diag(ee) ;
+ 
+ freqs_cm  = sqrt(abs(ee(1:3*Natoms)))/cm2Eh    ;
+ freqs_au = freqs_cm*cm2Eh ;
+printf(" Vibrational frequencies (all) in cm-1 \n") 
+for i =1: Nxyz
+  printf(" %d  :   %12.4f  (cm-1) \n",i, freqs_cm(i));
+endfor 
+
+
+######################################################
+#
+#  Thermochemistry 
+#  This molecule is a prolate symmetric top.
+#  Rotational symmetry number  2.
+#  Rotational temperature (Kelvin)      0.55466
+#  Rotational constant (GHZ):          11.557187
+#  Zero-point vibrational energy      30436.2 (Joules/Mol)
+#                                     7.27443 (Kcal/Mol)
+#  Vibrational temperatures:    920.92   920.92  1974.07  3505.35
+#           (Kelvin)
+#
+#  Zero-point correction=                           0.011593 (Hartree/Particle)
+#  Thermal correction to Energy=                    0.014240
+#  Thermal correction to Enthalpy=                  0.015184
+#  Thermal correction to Gibbs Free Energy=        -0.009126
+#  Sum of electronic and zero-point Energies=           -188.569348
+#  Sum of electronic and thermal Energies=              -188.566700
+#  Sum of electronic and thermal Enthalpies=            -188.565756
+#  Sum of electronic and thermal Free Energies=         -188.590066
+#
+#                      E (Thermal)             CV                S
+#                       KCal/Mol        Cal/Mol-Kelvin    Cal/Mol-Kelvin
+#  Total                    8.936              6.983             51.165
+#  Electronic               0.000              0.000              0.000
+#  Translational            0.889              2.981             37.270
+#  Rotational               0.592              1.987             13.103
+#  Vibrational              7.454              2.015              0.792
+#                        Q            Log10(Q)             Ln(Q)
+#  Total Bot       0.157673D+05          4.197756          9.665691
+#  Total V=0       0.338802D+10          9.529946         21.943512
+#  Vib (Bot)       0.511555D-05         -5.291108        -12.183226
+#  Vib (V=0)       0.109921D+01          0.041082          0.094595
+#  Electronic      0.100000D+01          0.000000          0.000000
+#  Translational   0.114679D+08          7.059484         16.255062
+#  Rotational      0.268770D+03          2.429380          5.593855
+#  ***** Axes restored to original set *****
+###########################################################
+
+   T=298.15  
+#------------------------------------------------
+#
+#   Translational corrections: 
+#
+   mass_tot  = (mC + mO +mO)/(1000* N_avog)   ;     # molar mass :  (g/mol)
+   Pressure  =  101325                              # Pa = [N/m^2] =    1  Atmoshpere        
+   q_transl  =   (2*pi*mass_tot *k_Boltz*T / h_Planck**2)**(3/2) *k_Boltz  *T/Pressure   # ok  (notice that kB*T/P =  V=22.4 liter of gas
+   E_transl  =  3/2*R*T * kJ2kcal /1000.0                                                # kcal/mol
+   S_transl  =   R*(log(q_transl) + 5/2)* kJ2kcal                                        # Cal/mol-K
+   Cv_transl =  3/2*R   * kJ2kcal                                                        # Cal/Mol-K
+ 
+
+#------------------------------------------------
+#
+#  Rotational  corrections: 
+#
+
+xyz_AA  =  [   0.000000    0.000000    0.000000
+               0.000000    0.000000    1.169167
+               0.000000    0.000000   -1.169167 ];
+xyz_m   = 1e-10*xyz_AA  ;                         # meter
+Mass    = [mC; mO; mO ]  / (1000* N_avog)   ;     # kg  (notice that  molar mass :  (g/mol))
+
+R_cm =  sum((xyz_m ) .* Mass )  ;               # center of mass
+xyz_cm =   xyz_m -R_cm            ;
+
+ix=1;iy=2;iz=3 ;    
+ Ixx =   sum(( xyz_cm(:,iy).^2 +  xyz_cm(:,iz).^2).*Mass(:))  ;
+ Iyy =   sum(( xyz_cm(:,ix).^2 +  xyz_cm(:,iz).^2).*Mass(:))  ;
+ Izz =   sum(( xyz_cm(:,ix).^2 +  xyz_cm(:,iy).^2).*Mass(:))  ;
+ Ixy = - sum(( xyz_cm(:,ix)   .*  xyz_cm(:,iy))   .*Mass(:))  ; 
+ Iyx =   Ixy                                                  ;
+ Iyz = - sum(( xyz_cm(:,iy)   .*  xyz_cm(:,iz))   .*Mass(:))  ;
+ Izy =   Iyz                                                  ;
+ Ixz = - sum(( xyz_cm(:,ix)   .*  xyz_cm(:,iz))   .*Mass(:))  ; 
+ Izx =   Ixz                                                  ;
+
+Inertia =  [Ixx, Ixy, Ixz;  Iyx, Iyy, Iyz ;  Izx, Izy, Izz ];
+
+II = eig(Inertia)     
+eps = max(II)*1e-10 ;   # added to  II to  avoid division by "0"
+
+T_rot     =  h_Planck^2 ./(8*pi^2*(II+eps) *k_Boltz ) 
+#-- linera molecules
+   T_rot_lin = min(T_rot)         # only one value for linera molecules   (smalles value  is easiest excitable)
+   sigma_rot =  2  ;              # degeneracy  from point group I think.
+   q_rot     =  1/sigma_rot* (T/T_rot_lin)
+
+   E_rot     =   R*T* (kJ2kcal/1000)                  # kcal/Mol
+   S_rot     =   R*(log(q_rot) +1) *kJ2kcal           # Cal/Mol-K
+   Cv_rot    =   R*kJ2kcal                            # Cal/Mol-K
+     
+
+#-- general case (polyatomic molecules):
+#   q_rot_gen  = sqrt(pi)/sigma_rot * sqrt(T/T_rot(1)) * sqrt(T/T_rot(2)) * sqrt(T/T_rot(3)) 
+#   E_rot_gen  =                        R* (1/2*T      +      1/2*T       + 1/2*T) *  (kJ2kcal/1000)   # kcal/Mol
+#   S_rot_gen  =  R*(log(q_rot_gen)  + 3/2) *kJ2kcal                                                   # Cal/Mol-K
+#   Cv_rot_gen =  3/2*R*kJ2kcal                                                                        # Cal/Mol-K     
+
+
+     
+
+
+##########################################
+#
+#     Vibrational  Thermal corrections: 
+#
+
+
+i0 =1 ; 
+i0 =6 ; 
+i1 =9 ;
+
+# vibrational temperatures
+   T_vib = freqs_au*Eh2kT
+
+# zero point energy
+   freqs_au = freqs_cm*cm2Eh   ;
+   zpe  =   sum(freqs_cm(i0:i1)*cm2Eh)/2                                          #  Eh
+
+# Vibrational partition function : 
+   q_vib_bot_tab  = exp(-T_vib/(2*T))      ./(1-exp(-T_vib/T))      ; 
+   q_vib_v0_tab   = 1./(1-exp(-T_vib/T))                            ;                                      
+   
+   q_vib_bot      =  prod(q_vib_bot_tab(i0:i1))                     ;                  #  ok
+   q_vib_v0       =  prod(q_vib_v0_tab(i0:i1))                      ;                  #  ok
+
+# thermal vibrational energy
+   E_vib          = R*(T_vib.*(0.5 + 1./(exp( T_vib/T) -1)))        ;                  # kJ/mol 
+   E_vib_tot      = sum(E_vib(i0:i1))  *  kJ2kcal/1000.0            ;                  # kcal/mol                          
+
+# vibrartional entropy
+   S_vib          = R*(   ( T_vib/T) ./ (exp( T_vib/T)-1)  -  log(1 - exp(-T_vib/T))) ; # kJ/(mol*K)   
+   S_vib_tot      = sum(S_vib(i0:i1))  * kJ2kcal                                        # Cal/(mol*K)
+
+# vibrational heat capacity
+   Cv_vib         =  dot(q_vib_bot_tab(i0:i1).^2 , (T_vib(i0:i1)/T).^2)*R*kJ2kcal       # Cal/Mol-K
+
+
+##################################################
+# print nicely everything:
+#
+S_total        =  S_rot  + S_vib_tot + S_transl                  # Cal/Mol-Kelvin
+Cv_total       =  Cv_rot + Cv_vib    + Cv_transl                 # Cal/Mol-Kelvin     
+E_electronic   = 0 ;    
+dE_thermal     = (  E_rot  +E_vib_tot +E_transl + E_electronic) ; # Kcal/mol
+dE_thermal_au  =   dE_thermal/Eh2kcal                           ; # Eh          
+dH_au          =   dE_thermal_au       + R*T /(Eh2kJ*1000)
+dS             =   T*S_total                                    ; # cal/Mol
+dS_au          =   dS /(Eh2kcal*1000)                           ;  # /1000* 
+dG_au          =   dH_au - dS_au   
+
+printf("# ===================================================================== \n");
+printf("#              Thermochemistry              \n");
+printf("# \n");
+#printf("  Thermochemistry 
+#printf("  This molecule is a prolate symmetric top.
+printf("  Rotational symmetry number  2. \n");
+printf("  Rotational temperature (Kelvin)    %12.6f  \n", T_rot_lin) ;    #  0.55466
+#printf("  Rotational constant (GHZ):          11.557187
+#printf("  Zero-point vibrational energy      30436.2 (Joules/Mol)
+#printf("                                     7.27443 (Kcal/Mol)
+printf("  Vibrational temperatures:  " ); # 920.92   920.92  1974.07  3505.35
+for i=i0:i1 ; printf(" %12.4f ",T_vib(i) ); endfor
+printf("\n           (Kelvin)  \n");
+#
+printf("  Zero-point correction=                           %12.6f    (Hartree/Particle) \n", zpe) ;   #  0.011593 (Hartree/Particle)
+printf("  Thermal correction to Energy=                    %12.6f \n",  dE_thermal_au );              #  0.014240
+printf("  Thermal correction to Enthalpy=                  %12.6f \n",  dH_au         );              #  0.015184
+printf("  Thermal correction to Gibbs Free Energy=         %12.6f \n",  dG_au         );              # -0.009126
+#printf("  Sum of electronic and zero-point Energies=           -188.569348
+#printf("  Sum of electronic and thermal Energies=              -188.566700
+#printf("  Sum of electronic and thermal Enthalpies=            -188.565756
+#printf("  Sum of electronic and thermal Free Energies=         -188.590066
+printf(" \n");
+printf("                      E (Thermal)             CV                S \n");
+printf("                       KCal/Mol        Cal/Mol-Kelvin    Cal/Mol-Kelvin \n");
+printf("  Total            %12.6f       %12.6f       %12.6f   \n", dE_thermal,Cv_total, S_total );  # 8.936              6.983             51.165
+printf("  Electronic       %12.6f       %12.6f       %12.6f   \n", 0.0, 0.0, 0.0                );  # 0.000              0.000              0.000
+printf("  Translational    %12.6f       %12.6f       %12.6f   \n", E_transl,Cv_transl,S_transl  );  # 0.889              2.981             37.270
+printf("  Rotational       %12.6f       %12.6f       %12.6f   \n", E_rot, Cv_rot, S_rot );          # 0.592              1.987             13.103
+printf("  Vibrational      %12.6f       %12.6f       %12.6f   \n", E_vib_tot,Cv_vib, S_vib_tot  );  # 7.454              2.015              0.792
+printf("\n                        Q                         Log10(Q)             Ln(Q) \n");
+#printf("  Total Bot       0.157673D+05          4.197756          9.665691
+#printf("  Total V=0       0.338802D+10          9.529946         21.943512
+#printf("  Vib (Bot)       0.511555D-05         -5.291108        -12.183226
+#printf("  Vib (V=0)       0.109921D+01          0.041082          0.094595
+#printf("  Electronic      0.100000D+01          0.000000          0.000000
+#printf("  Translational   0.114679D+08          7.059484         16.255062
+#printf("  Rotational      0.268770D+03          2.429380          5.593855
+
+#Q_tot = Q_vib_tot*Q_transl* Q_rot ;  
+Q_tot_v0  = q_vib_v0 *q_transl* q_rot ;  
+Q_tot_bot = q_vib_bot*q_transl* q_rot ;  
+#printf("  Total Bot       0.157673D+05          4.197756          9.665691
+printf("  Total Bot            %14.8e       %14.8f      %14.8f    \n", Q_tot_bot,log10(Q_tot_bot),log(Q_tot_bot) );     #  0.157673D+05          4.197756          9.665691
+printf("  Total V=0            %14.8e       %14.8f      %14.8f    \n", Q_tot_v0, log10(Q_tot_v0), log(Q_tot_v0)  );     #  0.338802D+10          9.529946         21.943512
+printf("  Vib (Bot)            %14.8e       %14.8f      %14.8f    \n", q_vib_bot,log10(q_vib_bot),log(q_vib_bot) );     #  0.511555D-05         -5.291108        -12.183226
+printf("  Vib (V=0)            %14.8e       %14.8f      %14.8f    \n", q_vib_v0, log10(q_vib_v0), log(q_vib_v0)  );     #  0.109921D+01          0.041082          0.094595
+printf("  Electronic           %14.8e       %14.8f      %14.8f    \n", 1.0, 0.0 ,0.0                             );     #  0.100000D+01          0.000000          0.000000
+printf("  Translational        %14.8e       %14.8f      %14.8f    \n", q_transl, log10( q_transl), log(q_transl) );     #  0.114679D+08          7.059484         16.255062
+printf("  Rotational           %14.8e       %14.8f      %14.8f    \n", q_rot,    log10(q_rot),log(q_rot)         );     #  0.268770D+03          2.429380          5.593855
+
+
+
+#  ***** Axes restored to original set *****
+###########################################################

@@ -1,0 +1,142 @@
+k_Boltz   = 1.380651e-23   	 (J/K) 
+h_Planck  = 6.626074e-34   	 (J*s) 
+c_light   = 7.251633e-07   	 (cm/aut)    
+R         = 8.314470e+00   	 (J/K*mol) 
+N_avog    = 6.022137e+23   	 (molecules) 
+ 
+Deb2eA    = 2.081943e-01   	 (Debye) => (e*Angstrom) 
+ 
+kJ2kcal = 0.2390
+Eh2kcal = 627.51
+Eh2kJ = 2625.5
+Eh2eV = 27.211
+Eh2MHz = 6.5797e+09
+Eh2kT = 315773
+cm2eV = 1.2398e-04
+cm2Eh = 4.5563e-06
+kT2Eh = 3.1668e-06
+bohr2A = 0.5292
+HMass = 1836.2
+amu = 1822.9
+au2fs = 0.024189
+
+ Convert wavenumbers(cm-1) to  period(fs):    t(fs) = wave2fs/w(cm-1)  
+
+ Convert   energy (eV) to wavelength (nm):    l(nm) = eV2nm/En(eV)  
+
+ interpolation(x,xyp0,xyp1) usage:  
+     x     - any number between x0, and x1 
+     xyp0  = [x0, y0, y'0] 
+     xyp1  = [x1, y1, y'1] 
+ 
+
+ G_conv(x,sigma) returns convolution of input signal with Gaussian (Gx). Usage : 
+         x     - input signal (evenly spaced points)        
+         sigma - half width of gaussian (in term of points) 
+                 when sigma <1  then   G(x)=Dirac_delta(x)  
+
+ G_conv_discrete(x,signal, sigma) : Use Gaussian convolution to calculate Density of States 
+        x      - input vector of Np-points on which we want to generate density of states DOS 
+                 'x' does not need to be spread uniformly . 
+        signal - input signal,  expected: 
+                 1D vector of Ne - points (like M.O energies) or 
+                 2 x 1D  vector of Ne -points ( excitation  energies and intensities)    
+        sigma - width of Gaussian used for convolution  in 'x'-length units 
+
+ gaussian (x,sigma)    returns Gaussian function  on vector 'x'     with width =sigma . Usage : 
+
+ gaussian0(x,x0,sigma) returns Gaussian function  on vector 'x -x0' with width =sigma . Usage : 
+         x     - input vector  of  x-values                 
+         x0    - input scalar  of  with Gaussian center     
+         sigma - half width of gaussian (in term of points) 
+                 when sigma <1  then   G(x)=Dirac_delta(x)  
+
+ lorentzian (x,x0,k0)  returns Lorentzian  function   1/pi *  k0/((x-x0).**2 +k0**2);  on vector 'x'  
+ 
+
+  L_conv(x,k)  returns convolution of input signal with Lorentzian  . Usage :  
+           x     - input signal (evenly spaced points)           
+           k     -  defines width of the Lorentzian  spread      
+ 
+mN = 14.007
+mO = 15.995
+ Vibrational frequencies (all) in cm-1 
+ 1  :         0.0478  (cm-1) 
+ 2  :         0.0110  (cm-1) 
+ 3  :         0.0110  (cm-1) 
+ 4  :         6.2376  (cm-1) 
+ 5  :         6.2376  (cm-1) 
+ 6  :       640.0756  (cm-1) 
+ 7  :       640.0756  (cm-1) 
+ 8  :      1372.0489  (cm-1) 
+ 9  :      2436.3401  (cm-1) 
+T = 298.15
+Pressure = 101325
+q_transl = 1.1468e+07
+E_transl = 0.8887
+S_transl = 37.270
+Cv_transl = 2.9808
+II =
+
+            0
+   7.2613e-46
+   7.2613e-46
+
+T_rot =
+
+   5.5466e+09
+   5.5466e-01
+   5.5466e-01
+
+T_rot_lin = 0.5547
+q_rot = 268.77
+E_rot = 0.5925
+S_rot = 13.103
+Cv_rot = 1.9872
+T_vib =
+
+   6.8740e-02
+   1.5770e-02
+   1.5770e-02
+   8.9745e+00
+   8.9745e+00
+   9.2092e+02
+   9.2092e+02
+   1.9741e+03
+   3.5053e+03
+
+zpe = 0.011593
+S_vib_tot = 0.7917
+Cv_vib = 2.0148
+S_total = 51.165
+Cv_total = 6.9828
+dH_au = 0.015184
+dG_au = -9.1263e-03
+# ===================================================================== 
+#              Thermochemistry              
+# 
+  Rotational symmetry number  2. 
+  Rotational temperature (Kelvin)        0.554657  
+  Vibrational temperatures:       920.9200      920.9200     1974.0595     3505.3272 
+           (Kelvin)  
+  Zero-point correction=                               0.011593    (Hartree/Particle) 
+  Thermal correction to Energy=                        0.014240 
+  Thermal correction to Enthalpy=                      0.015184 
+  Thermal correction to Gibbs Free Energy=            -0.009126 
+ 
+                      E (Thermal)             CV                S 
+                       KCal/Mol        Cal/Mol-Kelvin    Cal/Mol-Kelvin 
+  Total                8.935608           6.982827          51.165254   
+  Electronic           0.000000           0.000000           0.000000   
+  Translational        0.888729           2.980812          37.270213   
+  Rotational           0.592486           1.987208          13.103362   
+  Vibrational          7.454393           2.014807           0.791679   
+
+                        Q                         Log10(Q)             Ln(Q) 
+  Total Bot            1.57682813e+04           4.19778436          9.66575569    
+  Total V=0            3.38802528e+09           9.52994664         21.94351308    
+  Vib (Bot)            5.11588101e-06          -5.29107957        -12.18316093    
+  Vib (V=0)            1.09921518e+00           0.04108272          0.09459645    
+  Electronic           1.00000000e+00           0.00000000          0.00000000    
+  Translational        1.14678942e+07           7.05948368         16.25506188    
+  Rotational           2.68769663e+02           2.42938025          5.59385474    
