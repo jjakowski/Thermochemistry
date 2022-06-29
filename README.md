@@ -7,7 +7,7 @@ The thermochemistry implementation is based on the equations from "G98thermo.pdf
  Needed info:
     coordinates   :    for rotational contribution (inertia moments)
     Hessian       :    for vibrational contribution
-    symmetry      :    "sigma" degeneracy number
+    symmetry      :    "sigma" Rotational symmetry number  
     E_electronic  :     DFT energy for electronic contribution
 
  Files descritption:
