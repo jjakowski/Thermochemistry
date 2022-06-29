@@ -14,5 +14,5 @@ The thermochemistry implementation is based on the equations from "G98thermo.pdf
     CO2.fchk                     # g09  formatted checkpoint (with Hessian_
     CO2.out                      # g98  opt+frequency  output file  for co2
     G98thermo.pdf                # g09 white paper on thermochemistry 
-    octave-Hessian-fch.inp       #  code
-    octave-Hessian-fch.out       #
+    octave-Thermochem.inp        #  code
+    octave-Thermochem.out        #
